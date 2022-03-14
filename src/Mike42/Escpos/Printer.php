@@ -361,7 +361,7 @@ class Printer
     {
         /* Set connector */
         $this -> connector = $connector;
-        
+
         /* Set capability profile */
         if ($profile === null) {
             $profile = CapabilityProfile::load('default');
@@ -373,7 +373,7 @@ class Printer
         $this -> setPrintBuffer($buffer);
         $this -> initialize();
     }
-    
+
     /**
      * Print a barcode.
      *
@@ -440,7 +440,7 @@ class Printer
         // More advanced function B, used in preference
         $this -> connector -> write(self::GS . "k" . chr($type) . chr(strlen($content)) . $content);
     }
-    
+
     /**
      * Print an image, using the older "bit image" command. This creates padding on the right of the image,
      * if its width is not divisible by 8.
@@ -460,6 +460,23 @@ class Printer
         $header = Printer::dataHeader([$img -> getWidthBytes(), $img -> getHeight()], true);
         $this -> connector -> write(self::GS . "v0" . chr($size) . $header);
         $this -> connector -> write($rasterData);
+    }
+
+    /**
+     * writehex function
+     * example:
+     * $this -> connector -> write(self::ESC . "@");
+     * is
+     * $printer -> initialize();
+     * the same
+     * $printer -> writehex(["\x1b@"]);
+     * @param array $hexs
+     * @return void
+     */
+    public function writehex($hexs=[])
+    {
+        $str = implode(" ",$hexs);
+        $this -> connector -> write($str);
     }
 
     /**
@@ -501,7 +518,7 @@ class Printer
     {
         $this -> connector -> finalize();
     }
-    
+
     /**
      * Cut the paper.
      *
@@ -513,7 +530,7 @@ class Printer
         // TODO validation on cut() inputs
         $this -> connector -> write(self::GS . "V" . chr($mode) . chr($lines));
     }
-    
+
     /**
      * Print and feed line / Print and feed n lines.
      *
@@ -564,7 +581,7 @@ class Printer
     {
         return $this -> characterTable;
     }
-    
+
     /**
      * @return PrintBuffer
      */
@@ -621,7 +638,7 @@ class Printer
         $this -> wrapperSendGraphicsData('0', 'p', $header . $rasterData);
         $this -> wrapperSendGraphicsData('0', '2');
     }
-    
+
     /**
      * Initialize printer. This resets formatting back to the defaults.
      */
@@ -805,7 +822,7 @@ class Printer
         self::validateInteger($width, 1, 255, __FUNCTION__);
         $this -> connector -> write(self::GS . "w" . chr($width));
     }
-    
+
     /**
      * Set the position for the Human Readable Interpretation (HRI) of barcode characters.
      *
@@ -818,7 +835,7 @@ class Printer
         self::validateInteger($position, 0, 3, __FUNCTION__, "Barcode text position");
         $this -> connector -> write(self::GS . "H" . chr($position));
     }
-    
+
     /**
      * Turn double-strike mode on/off.
      *
@@ -851,7 +868,7 @@ class Printer
         self::validateBoolean($on, __FUNCTION__);
         $this -> connector -> write(self::ESC . "E". ($on ? chr(1) : chr(0)));
     }
-    
+
     /**
      * Select font. Most printers have two fonts (Fonts A and B), and some have a third (Font C).
      *
@@ -862,7 +879,7 @@ class Printer
         self::validateInteger($font, 0, 2, __FUNCTION__);
         $this -> connector -> write(self::ESC . "M" . chr($font));
     }
-    
+
     /**
      * Select justification.
      *
@@ -936,7 +953,7 @@ class Printer
         $this -> buffer = $buffer;
         $this -> buffer -> setPrinter($this);
     }
-    
+
     /**
      * Set black/white reverse mode on or off. In this mode, text is printed white on a black background.
      *
@@ -1025,7 +1042,7 @@ class Printer
     {
         $this -> buffer -> writeTextRaw((string)$str);
     }
-    
+
     /**
      * Wrapper for GS ( k, to calculate and send correct data length.
      *
@@ -1043,7 +1060,7 @@ class Printer
         $header = $this -> intLowHigh(strlen($data) + strlen($m) + 2, 2);
         $this -> connector -> write(self::GS . "(k" . $header . $cn . $fn . $m . $data);
     }
-    
+
     /**
      * Wrapper for GS ( L, to calculate and send correct data length.
      *
@@ -1060,7 +1077,7 @@ class Printer
         $header = $this -> intLowHigh(strlen($data) + 2, 2);
         $this -> connector -> write(self::GS . "(L" . $header . $m . $fn . $data);
     }
-    
+
     /**
      * Convert widths and heights to characters. Used before sending graphics to set the size.
      *
@@ -1081,7 +1098,7 @@ class Printer
         }
         return implode("", $outp);
     }
-    
+
     /**
      * Generate two characters for a number: In lower and higher parts, or more parts as needed.
      *
@@ -1100,7 +1117,7 @@ class Printer
         }
         return $outp;
     }
-    
+
     /**
      * Throw an exception if the argument given is not a boolean
      *
@@ -1146,7 +1163,7 @@ class Printer
     {
         self::validateIntegerMulti($test, [[$min, $max]], $source, $argument);
     }
-    
+
     /**
      * Throw an exception if the argument given is not an integer within one of the specified ranges
      *
